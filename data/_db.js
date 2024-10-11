@@ -52,4 +52,9 @@ let posts = [
   },
 ];
 
-export default { users, posts };
+const db = {
+  users,
+  posts,
+};
+
+export default db;
