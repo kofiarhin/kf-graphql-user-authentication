@@ -26,10 +26,10 @@ type Query {
 type Mutation {
     createUser(userInput: UserInput): User
     updateUser(id: ID!, updateUserInput: UpdateUserInput) : User
-    deleteUser(id: ID!): [User]
+    deleteUser(id: ID!): User
     createPost(postInput: PostInput): Post
-    deletePost(id: ID!): [Post]
-    updatePost(id: ID!, updatePostInput: UpdatePostInput): [Post]
+    deletePost(id: ID!): Post
+    updatePost(id: ID!, updatePostInput: UpdatePostInput): Post
 }
 
 input UpdatePostInput {

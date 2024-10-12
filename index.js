@@ -6,7 +6,7 @@ import connectDB from "./config/db.js";
 import reset from "./utility/reset.js";
 // coneect to database
 connectDB();
-reset();
+// reset();
 
 const server = new ApolloServer({
   // type definitions

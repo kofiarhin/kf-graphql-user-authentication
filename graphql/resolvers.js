@@ -8,9 +8,9 @@ const resolvers = {
       const users = await User.find();
       return users;
     },
-    user: (_, { id }) => {
-      const foundUser = db.users.find((user) => user.id === id);
-      return foundUser;
+    user: async (_, { id }) => {
+      const user = await User.findById(id);
+      return user;
     },
 
     posts: async (_, args) => {
@@ -25,9 +25,6 @@ const resolvers = {
   },
   Mutation: {
     createUser: async (_, { userInput: { name, email, password } }) => {
-      // delete this code
-      await User.deleteMany({});
-
       // generate salt
       const salt = await bcrypt.genSalt(10);
 
@@ -41,68 +38,64 @@ const resolvers = {
       await newUser.save();
       return newUser;
     },
-    deleteUser: (_, { id }) => {
-      const res = db.users.filter((user) => user.id !== id);
-      return res;
+    deleteUser: async (_, { id }) => {
+      const user = await User.findByIdAndDelete(id);
+      return user;
     },
 
-    updateUser: (_, { id, updateUserInput }) => {
-      const res = db.users.map((user) => {
-        if (user.id === id) {
-          return { ...user, ...updateUserInput };
-        }
-        return user;
-      });
-
-      db.users = res;
-      const foundUser = db.users.find((user) => user.id === id);
-      return foundUser;
+    updateUser: async (_, { id, updateUserInput }) => {
+      const user = await User.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            ...updateUserInput,
+          },
+        },
+        { new: true }
+      );
+      return user;
     },
 
-    createPost: (_, { postInput: { title, body, user_id } }) => {
-      const newPost = {
+    createPost: async (_, { postInput: { title, body, user_id } }) => {
+      const newPost = await Post.create({
         title,
         body,
         user_id,
-        id: Math.floor(Math.random() * 10000),
-      };
-      db.posts.push(newPost);
+      });
 
       return newPost;
     },
-    deletePost: (_, { id }) => {
-      const res = db.posts.filter((post) => post.id !== id);
-      return res;
+    deletePost: async (_, { id }) => {
+      const post = await Post.findByIdAndDelete(id);
+      return post;
     },
 
-    updatePost: (_, { id, updatePostInput }) => {
-      const res = db.posts.map((post) => {
-        if (post.id === id) {
-          return {
-            ...post,
+    updatePost: async (_, { id, updatePostInput }) => {
+      const post = await Post.findByIdAndUpdate(
+        id,
+        {
+          $set: {
             ...updatePostInput,
-          };
-        }
-        return post;
-      });
-      db.posts = res;
-      return db.posts;
+          },
+        },
+        { new: true }
+      );
+      console.log("xxxx", post);
+      return post;
     },
   },
 
   Post: {
     user: async (parent) => {
-      // const res = db.users.find((user) => user.id === parent.user_id);
       const userId = parent.user_id;
-
       const res = await User.findOne({ _id: parent.user_id });
       return res;
     },
   },
 
   User: {
-    posts: (parent) => {
-      const res = db.posts.filter((post) => post.user_id === parent.id);
+    posts: async (parent) => {
+      const res = await Post.find({ user_id: parent._id });
       return res;
     },
   },
